@@ -1,8 +1,18 @@
 from GazeTracking.gaze_tracking import GazeTracking
 import cv2
 import pandas as pd
+import argparse
 
-video = cv2.VideoCapture("kunal_gaze.mp4")
+
+parser = argparse.ArgumentParser(description='Process input and output file names')
+parser.add_argument('--input-video', dest='input_file', type=str, required=True, help='name of input file')
+parser.add_argument('--output-sheet', dest='output_file', type=str, required=True, help='name of output file')
+args = parser.parse_args()
+
+video_file = args.input_file
+output_sheet = args.output_file
+
+video = cv2.VideoCapture(video_file)
 gaze = GazeTracking()
 font_colour = (255, 0, 0)
 font_scale = 1
@@ -57,4 +67,4 @@ while cv2.getWindowProperty(winname, 0) >= 0:
     gaze_direction.loc[len(gaze_direction)] = (frame_number, direction)
 
 print(gaze_direction)
-gaze_direction.to_excel('output.xlsx', index=False)
+gaze_direction.to_excel(output_sheet, index=False)
