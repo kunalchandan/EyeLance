@@ -4,7 +4,12 @@ Works best in a linux environment. On windows just use WSL unless you hate yours
 Setup:
 
 ```
-sudo apt install git python3 python3-pip cmake
+sudo apt update
+sudo apt upgrade
+
+sudo apt install git cmake
+sudo apt install python3 
+sudo apt install python3-pip
 pip3 install numpy pandas openpyxl opencv_python dlib
 
 git clone https://github.com/kunalchandan/EyeLance.git
