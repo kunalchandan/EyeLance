@@ -157,7 +157,7 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
                 
                 gaze_direction.loc[trial_frame, f'FrameNumber-Trial-{trial_number:02}'] = frame_number
                 gaze_direction.loc[trial_frame, f'Coding-Trial-{trial_number:02}'] = direction
-                # gaze_direction.loc[len(gaze_direction)] = (frame_number, direction)
+        return gaze_direction
     return gaze_direction
 
 
