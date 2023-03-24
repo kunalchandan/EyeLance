@@ -21,10 +21,9 @@ FRAMES_PER_TRIAL = 516
 FRAMES_PER_TRIAL = 5
 
 
-# TODO revert to GOOEY
-# @Gooey(program_name='EyeLance')
+@Gooey(program_name='EyeLance')
 def argument_parser() -> Tuple[pathlib.Path, pathlib.Path]:
-    parser = argparse.ArgumentParser(description=
+    parser = GooeyParser(description=
                                      '''
 Program for manual labeling of eye-tracking data. 
 Outputs an excel sheet with the corresponding data in the format of:
@@ -37,14 +36,14 @@ Frame # Trial 1 | Coding Trial 1 | Frame # Trial 2 | Coding Trial 2 | ...
                         type=str, 
                         required=True, 
                         help='name of input file', 
-                        # widget='FileChooser',
+                        widget='FileChooser',
                         )
     parser.add_argument('--output-sheet', 
                         dest='output_file', 
                         type=str, 
                         required=True, 
                         help='name of output file',
-                        # widget='FileChooser',
+                        widget='FileChooser',
                         )
     args = parser.parse_args()
 
