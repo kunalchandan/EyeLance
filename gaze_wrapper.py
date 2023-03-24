@@ -18,7 +18,6 @@ FONT = cv2.FONT_HERSHEY_DUPLEX
 
 NUMBER_OF_TRIALS = 16
 FRAMES_PER_TRIAL = 516
-# FRAMES_PER_TRIAL = 5
 
 
 @Gooey(program_name='EyeLance')
