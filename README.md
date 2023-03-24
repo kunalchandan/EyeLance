@@ -1,4 +1,4 @@
-# Gaze Writing Program
+# EyeLance: Gaze Writing Program
 Works best in a linux environment. On windows just use WSL unless you hate yourself.
 
 Setup:
@@ -18,11 +18,22 @@ git clone https://github.com/kunalchandan/EyeLance.git
 cd EyeLance
 git clone https://github.com/antoinelame/GazeTracking.git
 
-python3 gaze_wrapper.py --input-video input_video.mp4 --output-sheet output-sheet.xlsx
 
 ```
 
 ## Usage
+
+Launch the program with:
+```
+python3 gaze_wrapper.py
+```
+This will take in a path to the video file you want to label and will output an excel sheet with the appropriate labeled codings.
+
+
+Old usage syntax CLI only. DEPRECATED.
+```
+python3 gaze_wrapper.py --input-video input_video.mp4 --output-sheet output-sheet.xlsx
+```
 
 ### Launcher
 ![image](docs/launcher.png)
@@ -47,3 +58,28 @@ Can also edit selection and code another video and output another excel sheet or
 ### Resulting output
 ![image](docs/output_sheet.png)
 
+
+## Issues/Feature Requests
+Open an Issue on github and I'll have a look one day.
+
+
+## License 
+Released under the GPLv2 License
+
+
+## Citation
+You don't have to, but it'd be real nice 😉.
+
+
+Bibtex format:
+
+```bibtex
+ @misc{kchandan_2023_eyelance,
+   title     = {EyeLance: Computer assisted gaze-tracking software},
+   author    = {Kunal Chandan},
+   month     = mar,
+   year      = {2023},
+   version   = {1.0},
+   url       = {https://github.com/kunalchandan/EyeLance},
+ }
+```
