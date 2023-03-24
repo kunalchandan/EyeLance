@@ -114,6 +114,7 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
                 cv2.putText(frame, f"LIKELY TOO FEW FRAMES LEFT", (60, 300), FONT, FONT_SCALE*2, (0, 0, 255), 2)
                 cv2.putText(frame, f"Need minimum of {NUMBER_OF_TRIALS*FRAMES_PER_TRIAL}", (60, 400), FONT, FONT_SCALE*2, (0, 0, 255), 2)
                 cv2.putText(frame, f"Have ~ {total_frames - num_skipped_frames} left", (60, 480), FONT, FONT_SCALE*2, (0, 0, 255), 2)
+            cv2.imshow(winname, frame)
 
             key_input = chr(cv2.waitKey(0)).lower()
             if cv2.getWindowProperty(winname, 0) < 0:
@@ -121,7 +122,6 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
                 exit()
             if key_input == "m":
                 skipping = False
-            cv2.imshow(winname, frame)
 
         # UI to actually begin labelling
         for trial_number in range(1, NUMBER_OF_TRIALS+1):
