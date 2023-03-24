@@ -18,7 +18,7 @@ FONT = cv2.FONT_HERSHEY_DUPLEX
 
 NUMBER_OF_TRIALS = 16
 FRAMES_PER_TRIAL = 516
-FRAMES_PER_TRIAL = 5
+# FRAMES_PER_TRIAL = 5
 
 
 @Gooey(program_name='EyeLance')
@@ -70,9 +70,10 @@ def get_direction(frame: np.ndarray, gaze: GazeTracking) -> str:
 
 def annotate_frame(gaze: GazeTracking, direction: str, trial_number: int, trial_frame: int) -> np.ndarray:
     new_frame = gaze.annotated_frame()
-    cv2.putText(new_frame, f"Computer's Guess: {direction}", (60, 60), FONT, FONT_SCALE, FONT_COLOUR, 2)
-    cv2.putText(new_frame, f"Override with:\n(A=Left)\n(D=Right)\n(S=Other)", (60, 100), FONT, FONT_SCALE, FONT_COLOUR, 2)
-    cv2.putText(new_frame, f"Use Computer Guess with Q key", (60, 250), FONT, FONT_SCALE, FONT_COLOUR, 2)
+    cv2.putText(new_frame, f"Detected direction: {direction}", (60, 60), FONT, FONT_SCALE, FONT_COLOUR, 2)
+    cv2.putText(new_frame, f"Use detected 'W' key (Auto)", (60, 90), FONT, FONT_SCALE, FONT_COLOUR, 2)
+    cv2.putText(new_frame, f"Coding Scheme: (Q=Black) (W=Auto)  (E=Flash)", (60, 130), FONT, FONT_SCALE, FONT_COLOUR, 2)
+    cv2.putText(new_frame, f"Coding Scheme: (A=Left)  (S=Other) (D=Right) ", (60, 170), FONT, FONT_SCALE, FONT_COLOUR, 2)
     cv2.putText(new_frame, f"Trial Number {trial_number}", (60, 500), FONT, FONT_SCALE, FONT_COLOUR, 2)
     cv2.putText(new_frame, f"Trial Frame {trial_frame}", (60, 550), FONT, FONT_SCALE, FONT_COLOUR, 2)
     return new_frame
@@ -141,7 +142,7 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
                     
                 # User is slow write what the computer thinks
                 if key_input == -1:
-                    key_input = 'q'
+                    key_input = 'w'
                     
                 if key_input == 'a':
                     direction = 'Left'
@@ -149,7 +150,7 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
                     direction = 'Other'
                 elif key_input == 'd':
                     direction = 'Right'
-                elif key_input == 'q': # Computer's best guess
+                elif key_input == 'w': # Computer's best guess
                     direction = direction
                 elif key_input == 'k': # Skip frame
                     continue
