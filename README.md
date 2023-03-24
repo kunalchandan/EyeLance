@@ -11,6 +11,7 @@ sudo apt install git cmake
 sudo apt install ffmpeg libsm6 libxext6
 sudo apt install python3 
 sudo apt install python3-pip
+pip3 install attrdict3 Gooey
 pip3 install numpy pandas openpyxl opencv_python dlib
 
 git clone https://github.com/kunalchandan/EyeLance.git
