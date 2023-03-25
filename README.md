@@ -21,6 +21,35 @@ git clone https://github.com/antoinelame/GazeTracking.git
 
 ```
 
+Build linux binary from WSL
+```
+pip install pyinstaller
+pyinstaller --onefile gaze_wrapper.py
+```
+
+
+Build windows binary from WSL
+
+```
+sudo apt update
+sudo apt upgrade
+sudo apt install wine
+sudo apt update
+sudo apt upgrade
+sudo dpkg --add-architecture i386 
+sudo apt update
+sudo apt upgrade
+sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+sudo apt update
+sudo apt upgrade
+sudo apt install --install-recommends winehq-devel
+sudo apt update
+sudo apt upgrade
+
+THIS IS TOO HARD LOL
+```
+
 ## Usage
 
 Launch the program with:
