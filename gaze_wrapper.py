@@ -13,7 +13,7 @@ from typing import Tuple
 
 
 FONT_COLOUR = (255, 0, 0)
-FONT_SCALE = 1
+FONT_SCALE = 0.6
 FONT = cv2.FONT_HERSHEY_DUPLEX
 
 NUMBER_OF_TRIALS = 16
@@ -24,23 +24,23 @@ FRAMES_PER_TRIAL = 516
 def argument_parser() -> Tuple[pathlib.Path, pathlib.Path]:
     parser = GooeyParser(description=
                                      '''
-Program for manual labeling of eye-tracking data. 
+Program for manual labeling of eye-tracking data.
 Outputs an excel sheet with the corresponding data in the format of:
-Frame # Trial 1 | Coding Trial 1 | Frame # Trial 2 | Coding Trial 2 | ... 
+Frame # Trial 1 | Coding Trial 1 | Frame # Trial 2 | Coding Trial 2 | ...
 --------------------------------------------------------------------------
 ...
 ''')
-    parser.add_argument('--input-video', 
-                        dest='input_file', 
-                        type=str, 
-                        required=True, 
-                        help='name of input file', 
+    parser.add_argument('--input-video',
+                        dest='input_file',
+                        type=str,
+                        required=True,
+                        help='name of input file',
                         widget='FileChooser',
                         )
-    parser.add_argument('--output-sheet', 
-                        dest='output_file', 
-                        type=str, 
-                        required=True, 
+    parser.add_argument('--output-sheet',
+                        dest='output_file',
+                        type=str,
+                        required=True,
                         help='name of output file',
                         widget='FileChooser',
                         )
@@ -69,20 +69,44 @@ def get_direction(frame: np.ndarray, gaze: GazeTracking) -> str:
 
 def annotate_frame(gaze: GazeTracking, direction: str, trial_number: int, trial_frame: int) -> np.ndarray:
     new_frame = gaze.annotated_frame()
-    cv2.putText(new_frame, f"Detected direction: {direction}", (60, 60), FONT, FONT_SCALE, FONT_COLOUR, 2)
-    cv2.putText(new_frame, f"Use detected 'W' key (Auto)", (60, 90), FONT, FONT_SCALE, FONT_COLOUR, 2)
-    cv2.putText(new_frame, f"Coding Scheme: (Q=Black) (W=Auto)  (E=Flash)", (60, 130), FONT, FONT_SCALE, FONT_COLOUR, 2)
-    cv2.putText(new_frame, f"Coding Scheme: (A=Left)  (S=Other) (D=Right) ", (60, 170), FONT, FONT_SCALE, FONT_COLOUR, 2)
-    cv2.putText(new_frame, f"Trial Number {trial_number}", (60, 500), FONT, FONT_SCALE, FONT_COLOUR, 2)
-    cv2.putText(new_frame, f"Trial Frame {trial_frame}", (60, 550), FONT, FONT_SCALE, FONT_COLOUR, 2)
+    cv2.putText(new_frame, f"Detected direction: {direction}", (300, 260), FONT, FONT_SCALE, FONT_COLOUR, 2)
+    cv2.putText(new_frame, f"Use detected 'W' key (Auto)", (300, 290), FONT, FONT_SCALE, FONT_COLOUR, 2)
+    cv2.putText(new_frame, f"Coding Scheme: (Q=Black) (W=Auto)  (E=Flash)", (300, 330), FONT, FONT_SCALE, FONT_COLOUR, 2)
+    cv2.putText(new_frame, f"Coding Scheme: (A=Left)  (S=Other) (D=Right) ", (300, 360), FONT, FONT_SCALE, FONT_COLOUR, 2)
+    cv2.putText(new_frame, f"Trial Number {trial_number}", (60, 300), FONT, FONT_SCALE, FONT_COLOUR, 2)
+    cv2.putText(new_frame, f"Trial Frame {trial_frame}", (60, 330), FONT, FONT_SCALE, FONT_COLOUR, 2)
     return new_frame
 
 
+def skip_frames(video, total_frames, num_skipped_frames, winname):
+    # UI to skip initial portion of video
+    skipping = True
+    while skipping:
+        num_skipped_frames += 1
+        still_reading, frame = video.read()
+        cv2.putText(frame, f"Press M to begin annotation", (60, 250), FONT, FONT_SCALE*2, (0, 0, 255), 2)
+        cv2.putText(frame, f"Skip frame with any key", (60, 200), FONT, FONT_SCALE, FONT_COLOUR, 2)
+
+        if (total_frames - num_skipped_frames) < NUMBER_OF_TRIALS*FRAMES_PER_TRIAL:
+            cv2.putText(frame, f"LIKELY TOO FEW FRAMES LEFT", (60, 300), FONT, FONT_SCALE*2, (0, 0, 255), 2)
+            cv2.putText(frame, f"Need minimum of {NUMBER_OF_TRIALS*FRAMES_PER_TRIAL}", (60, 400), FONT, FONT_SCALE*2, (0, 0, 255), 2)
+            cv2.putText(frame, f"Have ~ {total_frames - num_skipped_frames} left", (60, 480), FONT, FONT_SCALE*2, (0, 0, 255), 2)
+        cv2.imshow(winname, frame)
+
+        key_input = chr(cv2.waitKey(0)).lower()
+        if cv2.getWindowProperty(winname, 0) < 0:
+            print("QUITTING WITHOUT WRITING ANYTHING!!")
+            exit()
+        if key_input == "m":
+            skipping = False
+
+
+
 def process_video(video_file: pathlib.Path) -> pd.DataFrame:
-    # Get Video 
+    # Get Video
     video = cv2.VideoCapture(video_file)
 
-    if not video.isOpened(): 
+    if not video.isOpened():
         print("Could not open: ", video_file)
         return
     total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -99,32 +123,12 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
     cv2.namedWindow(winname)
     cv2.moveWindow(winname, 40,30)
 
-    skipping = True
     num_skipped_frames = 0
     # IDK if this while loop is helping
     while cv2.getWindowProperty(winname, 0) >= 0:
-        # UI to skip initial portion of video
-        while skipping:
-            num_skipped_frames += 1
-            still_reading, frame = video.read()
-            cv2.putText(frame, f"Press M to begin annotation", (60, 250), FONT, FONT_SCALE*2, (0, 0, 255), 2)
-            cv2.putText(frame, f"Skip frame with any key", (60, 200), FONT, FONT_SCALE, FONT_COLOUR, 2)
-
-            if (total_frames - num_skipped_frames) < NUMBER_OF_TRIALS*FRAMES_PER_TRIAL:
-                cv2.putText(frame, f"LIKELY TOO FEW FRAMES LEFT", (60, 300), FONT, FONT_SCALE*2, (0, 0, 255), 2)
-                cv2.putText(frame, f"Need minimum of {NUMBER_OF_TRIALS*FRAMES_PER_TRIAL}", (60, 400), FONT, FONT_SCALE*2, (0, 0, 255), 2)
-                cv2.putText(frame, f"Have ~ {total_frames - num_skipped_frames} left", (60, 480), FONT, FONT_SCALE*2, (0, 0, 255), 2)
-            cv2.imshow(winname, frame)
-
-            key_input = chr(cv2.waitKey(0)).lower()
-            if cv2.getWindowProperty(winname, 0) < 0:
-                print("QUITTING WITHOUT WRITING ANYTHING!!")
-                exit()
-            if key_input == "m":
-                skipping = False
-
         # UI to actually begin labelling
         for trial_number in range(1, NUMBER_OF_TRIALS+1):
+            skip_frames(video, total_frames, num_skipped_frames, winname)
             for trial_frame in range(FRAMES_PER_TRIAL):
                 still_reading, frame = video.read()
                 if not still_reading:
@@ -138,11 +142,11 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
                 if cv2.getWindowProperty(winname, 0) < 0:
                     print("QUITTING WITHOUT WRITING ANYTHING!!")
                     exit()
-                    
+
                 # User is slow write what the computer thinks
                 if key_input == -1:
                     key_input = 'w'
-                    
+
                 if key_input == 'a':
                     direction = 'Left'
                 elif key_input == 's':
@@ -153,7 +157,7 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
                     direction = direction
                 elif key_input == 'k': # Skip frame
                     continue
-                
+
                 gaze_direction.loc[trial_frame, f'FrameNumber-Trial-{trial_number:02}'] = frame_number
                 gaze_direction.loc[trial_frame, f'Coding-Trial-{trial_number:02}'] = direction
         return gaze_direction
