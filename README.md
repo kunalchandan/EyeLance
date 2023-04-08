@@ -8,8 +8,8 @@ sudo apt update
 sudo apt upgrade
 
 sudo apt install git cmake
-sudo apt install ffmpeg libsm6 libxext6
-sudo apt install python3 
+sudo apt install ffmpeg libsm6 libxext6 libgtk-3-dev
+sudo apt install python3
 sudo apt install python3-pip
 pip3 install attrdict3 Gooey
 pip3 install numpy pandas openpyxl opencv_python dlib
@@ -28,6 +28,12 @@ pyinstaller --onefile gaze_wrapper.py
 ```
 
 
+Run command in terminal
+```
+wsl.exe -e bash -lic "python3 /home/USER_NAME/gaze/gaze_wrapper"
+```
+Or make that a shortcut
+
 Build windows binary from WSL
 
 ```
@@ -36,7 +42,7 @@ sudo apt upgrade
 sudo apt install wine
 sudo apt update
 sudo apt upgrade
-sudo dpkg --add-architecture i386 
+sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt upgrade
 sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
@@ -75,7 +81,7 @@ This example has too few frames to fill the entire dataset so a warning is shown
 
 ![image](docs/too_few_frames.png)
 
-### Coding 
+### Coding
 ![image](docs/coding_data.png)
 
 ### Completion Screen
@@ -92,7 +98,7 @@ Can also edit selection and code another video and output another excel sheet or
 Open an Issue on github and I'll have a look one day.
 
 
-## License 
+## License
 Released under the GPLv2 License
 
 
