@@ -102,7 +102,7 @@ def skip_frames(video, total_frames, num_skipped_frames, winname):
 
 
 
-def process_video(video_file: pathlib.Path) -> pd.DataFrame:
+def process_video(video_file: pathlib.Path, output_sheet_path) -> pd.DataFrame:
     # Get Video
     video = cv2.VideoCapture(video_file)
 
@@ -133,7 +133,11 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
                 still_reading, frame = video.read()
                 if not still_reading:
                     return gaze_direction
-                direction = get_direction(frame, gaze)
+                try:
+                    direction = get_direction(frame, gaze)
+                except:
+                    print('Failed to get direction')
+                    direction = '???'
                 annotated_frame = annotate_frame(gaze, direction, trial_number, trial_frame)
                 cv2.imshow(winname, annotated_frame)
                 frame_number += 1
@@ -148,11 +152,15 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
                     key_input = 'w'
 
                 if key_input == 'a':
-                    direction = 'Left'
+                    direction = 'Right'
                 elif key_input == 's':
                     direction = 'Other'
                 elif key_input == 'd':
-                    direction = 'Right'
+                    direction = 'Left'
+                elif key_input == 'q':
+                    direction = 'Black'
+                elif key_input == 'e':
+                    direction = 'Flash'
                 elif key_input == 'w': # Computer's best guess
                     direction = direction
                 elif key_input == 'k': # Skip frame
@@ -160,13 +168,14 @@ def process_video(video_file: pathlib.Path) -> pd.DataFrame:
 
                 gaze_direction.loc[trial_frame, f'FrameNumber-Trial-{trial_number:02}'] = frame_number
                 gaze_direction.loc[trial_frame, f'Coding-Trial-{trial_number:02}'] = direction
+                gaze_direction.to_excel(output_sheet_path, index=False)
         return gaze_direction
     return gaze_direction
 
 
 def main():
     video_file, output_sheet = argument_parser()
-    gaze_data = process_video(video_file)
+    gaze_data = process_video(video_file, output_sheet)
 
     print(gaze_data)
     gaze_data.to_excel(output_sheet, index=False)
