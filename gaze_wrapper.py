@@ -134,7 +134,8 @@ def process_video(video_file: pathlib.Path, output_sheet_path) -> pd.DataFrame:
                 if not still_reading:
                     return gaze_direction
                 try:
-                    direction = get_direction(frame, gaze)
+                    direction = '???'
+                    # direction = get_direction(frame, gaze)
                 except:
                     print('Failed to get direction')
                     direction = '???'
