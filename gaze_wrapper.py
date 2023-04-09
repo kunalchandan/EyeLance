@@ -1,4 +1,3 @@
-from GazeTracking.gaze_tracking import GazeTracking
 import cv2
 
 import pandas as pd
@@ -49,26 +48,11 @@ Frame # Trial 1 | Coding Trial 1 | Frame # Trial 2 | Coding Trial 2 | ...
     video_file = args.input_file
     output_sheet = args.output_file
 
-    return [video_file, output_sheet]
+    return (video_file, output_sheet)
 
 
-def get_direction(frame: np.ndarray, gaze: GazeTracking) -> str:
-    gaze.refresh(frame)
-    direction = 'Other'
-    if gaze.is_right():
-        direction = 'Right'
-    elif gaze.is_left():
-        direction = 'Left'
-    elif gaze.is_center():
-        direction = 'Other'
-    else:
-        direction = 'Other'
 
-    return direction
-
-
-def annotate_frame(gaze: GazeTracking, direction: str, trial_number: int, trial_frame: int) -> np.ndarray:
-    new_frame = gaze.annotated_frame()
+def annotate_frame(new_frame, direction: str, trial_number: int, trial_frame: int) -> np.ndarray:
     cv2.putText(new_frame, f"Detected direction: {direction}", (300, 260), FONT, FONT_SCALE, FONT_COLOUR, 2)
     cv2.putText(new_frame, f"Use detected 'W' key (Auto)", (300, 290), FONT, FONT_SCALE, FONT_COLOUR, 2)
     cv2.putText(new_frame, f"Coding Scheme: (Q=Black) (W=Auto)  (E=Flash)", (300, 330), FONT, FONT_SCALE, FONT_COLOUR, 2)
@@ -110,7 +94,6 @@ def process_video(video_file: pathlib.Path, output_sheet_path) -> pd.DataFrame:
         print("Could not open: ", video_file)
         return
     total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-    gaze = GazeTracking()
 
     frame_number = 0
 
@@ -133,13 +116,8 @@ def process_video(video_file: pathlib.Path, output_sheet_path) -> pd.DataFrame:
                 still_reading, frame = video.read()
                 if not still_reading:
                     return gaze_direction
-                try:
-                    direction = '???'
-                    # direction = get_direction(frame, gaze)
-                except:
-                    print('Failed to get direction')
-                    direction = '???'
-                annotated_frame = annotate_frame(gaze, direction, trial_number, trial_frame)
+                direction = 'Other'
+                annotated_frame = annotate_frame(frame, direction, trial_number, trial_frame)
                 cv2.imshow(winname, annotated_frame)
                 frame_number += 1
 
@@ -169,7 +147,7 @@ def process_video(video_file: pathlib.Path, output_sheet_path) -> pd.DataFrame:
 
                 gaze_direction.loc[trial_frame, f'FrameNumber-Trial-{trial_number:02}'] = frame_number
                 gaze_direction.loc[trial_frame, f'Coding-Trial-{trial_number:02}'] = direction
-                gaze_direction.to_excel(output_sheet_path, index=False)
+                gaze_direction.to_csv(f"{output_sheet_path}-Intermediary.csv", index=False)
         return gaze_direction
     return gaze_direction
 
